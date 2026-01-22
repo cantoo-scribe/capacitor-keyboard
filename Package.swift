@@ -3,11 +3,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "CapacitorKeyboard",
+    name: "CantooKeyboard",
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "CapacitorKeyboard",
+            name: "CantooKeyboard",
             targets: ["KeyboardPlugin"])
     ],
     dependencies: [
@@ -18,13 +18,13 @@ let package = Package(
             name: "KeyboardPlugin",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm")
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
             ],
             path: "ios/Sources/KeyboardPlugin",
             publicHeadersPath: "include"),
         .testTarget(
             name: "KeyboardPluginTests",
             dependencies: ["KeyboardPlugin"],
-            path: "ios/Tests/KeyboardPluginTests")
+            path: "ios/Tests/KeyboardPluginTests"),
     ]
 )

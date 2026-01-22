@@ -3,13 +3,13 @@ require 'json'
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name = 'CapacitorKeyboard'
+  s.name = 'CantooKeyboard'
   s.version = package['version']
   s.summary = package['description']
   s.license = package['license']
-  s.homepage = 'https://capacitorjs.com'
+  s.homepage = 'https://github.com/cantoo-scribe/capacitor-keyboard'
   s.author = package['author']
-  s.source = { :git => 'https://github.com/ionic-team/capacitor-keyboard.git', :tag => 'v' + package['version'] }
+  s.source = { :git => 'https://github.com/cantoo-scribe/capacitor-keyboard.git', :tag => 'v' + package['version'] }
   s.source_files = 'ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}', 'keyboard/ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}'
   s.ios.deployment_target = '15.0'
   s.dependency 'Capacitor'

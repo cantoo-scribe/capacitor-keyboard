@@ -1,5 +1,5 @@
 {
-  "name": "@capacitor/keyboard",
+  "name": "@cantoo/keyboard",
   "version": "8.0.5",
   "description": "The Keyboard API provides keyboard display and visibility control, along with event tracking when the keyboard shows and hides.",
   "main": "dist/plugin.cjs.js",
@@ -13,16 +13,16 @@
     "ios/Sources",
     "ios/Tests",
     "Package.swift",
-    "CapacitorKeyboard.podspec"
+    "CantooKeyboard.podspec"
   ],
   "author": "Ionic <hi@ionicframework.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/capacitor-keyboard"
+    "url": "git+https://github.com/cantoo-scribe/capacitor-keyboard.git"
   },
   "bugs": {
-    "url": "https://github.com/ionic-team/capacitor-keyboard/issues"
+    "url": "https://github.com/cantoo-scribe/capacitor-keyboard/issues"
   },
   "keywords": [
     "capacitor",
@@ -44,7 +44,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "publish:cocoapod": "pod trunk push ./CapacitorKeyboard.podspec --allow-warnings"
+    "publish:cocoapod": "pod trunk push ./CantooKeyboard.podspec --allow-warnings"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
