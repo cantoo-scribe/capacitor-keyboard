@@ -1,3 +1,11 @@
+## [8.0.4](https://github.com/ionic-team/capacitor-keyboard/compare/v8.0.3...v8.0.4) (2026-06-16)
+
+
+### Bug Fixes
+
+* **android:** reset WebView height when keyboard hides without animation ([#60](https://github.com/ionic-team/capacitor-keyboard/issues/60)) ([f2e9cd2](https://github.com/ionic-team/capacitor-keyboard/commit/f2e9cd2803e87982c07381ee1987772c2d4a7a60))
+* **ios:** prevent black QuickType bar when using Magic Keyboard on iPad + Fix Keyboard on iOS 26 ([#52](https://github.com/ionic-team/capacitor-keyboard/issues/52)) ([068f643](https://github.com/ionic-team/capacitor-keyboard/commit/068f64396600f54fe31775776668634a38afc937))
+
 ## [8.0.3](https://github.com/ionic-team/capacitor-keyboard/compare/v8.0.2...v8.0.3) (2026-04-10)
 
 
