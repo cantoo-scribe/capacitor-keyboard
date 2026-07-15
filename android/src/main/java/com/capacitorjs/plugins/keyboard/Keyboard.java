@@ -57,16 +57,6 @@ public class Keyboard {
         FrameLayout content = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         rootView = content.getRootView();
 
-        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
-            boolean showingKeyboard = ViewCompat.getRootWindowInsets(rootView).isVisible(WindowInsetsCompat.Type.ime());
-
-            if (showingKeyboard && resizeOnFullScreen) {
-                possiblyResizeChildOfContent(true);
-            }
-
-            return insets;
-        });
-
         ViewCompat.setWindowInsetsAnimationCallback(
             rootView,
             new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
@@ -91,10 +81,6 @@ public class Keyboard {
                     DisplayMetrics dm = activity.getResources().getDisplayMetrics();
                     final float density = dm.density;
 
-                    if (resizeOnFullScreen) {
-                        possiblyResizeChildOfContent(showingKeyboard);
-                    }
-
                     if (showingKeyboard) {
                         keyboardEventListener.onKeyboardEvent(EVENT_KB_WILL_SHOW, Math.round(imeHeight / density));
                     } else {
@@ -106,8 +92,10 @@ public class Keyboard {
                 @Override
                 public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
                     super.onEnd(animation);
-                    boolean showingKeyboard = ViewCompat.getRootWindowInsets(rootView).isVisible(WindowInsetsCompat.Type.ime());
                     WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(rootView);
+                    if (insets == null) return;
+
+                    boolean showingKeyboard = insets.isVisible(WindowInsetsCompat.Type.ime());
                     int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
                     DisplayMetrics dm = activity.getResources().getDisplayMetrics();
                     final float density = dm.density;
@@ -123,6 +111,13 @@ public class Keyboard {
 
         mChildOfContent = content.getChildAt(0);
         frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+
+        if (resizeOnFullScreen) {
+            ViewCompat.setOnApplyWindowInsetsListener(content, (view, windowInsets) -> {
+                possiblyResizeChildOfContent(windowInsets.isVisible(WindowInsetsCompat.Type.ime()));
+                return ViewCompat.onApplyWindowInsets(view, windowInsets);
+            });
+        }
     }
 
     public void show() {
@@ -141,8 +136,17 @@ public class Keyboard {
     }
 
     private void possiblyResizeChildOfContent(boolean keyboardShown) {
-        int usableHeightNow = keyboardShown ? computeUsableHeight() : -1;
-        if (usableHeightPrevious != usableHeightNow) {
+        if (!keyboardShown) {
+            if (frameLayoutParams.height != FrameLayout.LayoutParams.MATCH_PARENT) {
+                frameLayoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT;
+                mChildOfContent.requestLayout();
+            }
+            usableHeightPrevious = FrameLayout.LayoutParams.MATCH_PARENT;
+            return;
+        }
+
+        int usableHeightNow = computeUsableHeight();
+        if (usableHeightPrevious != usableHeightNow || frameLayoutParams.height != usableHeightNow) {
             frameLayoutParams.height = usableHeightNow;
             mChildOfContent.requestLayout();
             usableHeightPrevious = usableHeightNow;
@@ -152,7 +156,36 @@ public class Keyboard {
     private int computeUsableHeight() {
         Rect r = new Rect();
         mChildOfContent.getWindowVisibleDisplayFrame(r);
+        if (shouldApplyEdgeToEdgeAdjustments()) {
+            WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(rootView);
+            if (insets != null) {
+                int systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+                if (systemBars > 0) {
+                    return r.bottom + systemBars;
+                }
+            }
+        }
+
         return isOverlays() ? r.bottom : r.height();
+    }
+
+    private boolean shouldApplyEdgeToEdgeAdjustments() {
+        var adjustMarginsForEdgeToEdge = this.bridge == null ? "auto" : this.bridge.getConfig().adjustMarginsForEdgeToEdge();
+        if (adjustMarginsForEdgeToEdge.equals("force")) { // Force edge-to-edge adjustments regardless of app settings
+            return true;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM && adjustMarginsForEdgeToEdge.equals("auto")) { // Auto means that we need to check the app's edge-to-edge preference
+            TypedValue value = new TypedValue();
+            boolean optOutAttributeExists = activity
+                .getTheme()
+                .resolveAttribute(android.R.attr.windowOptOutEdgeToEdgeEnforcement, value, true);
+
+            if (!optOutAttributeExists) { // Default is to apply edge to edge
+                return true;
+            } else {
+                return value.data == 0;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("deprecation")
